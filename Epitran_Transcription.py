@@ -1,16 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
 import epitran
 from phonemizer.punctuation import Punctuation
 from epitran.backoff import Backoff
 import tqdm
-
-
-# In[90]:
 
 
 path_to_text = ""
@@ -65,7 +56,6 @@ Language_codes = {'eng-Latn' : 'English',
                  'zul-Latn' : 'Zulu-NT'}
 
 
-# In[87]:
 
 
 def Txt_to_IPA_epi(lg, path_to_text, path_to_IPA):
@@ -88,8 +78,6 @@ def Txt_to_IPA_epi(lg, path_to_text, path_to_IPA):
             f.write("\n")      
     print('Language', lg, 'done')
 
-
-# In[ ]:
 
 
 def Txt_to_IPA_epi_one_seq(lg, path_to_IPA):

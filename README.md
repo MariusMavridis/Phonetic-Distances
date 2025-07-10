@@ -10,6 +10,6 @@ Alldist.txt contains all phonetic distances between pairs of languages in our co
 
 Raw_Texts contains all 67 Bible text files 
 
-IPA_Bibles contains all IPA transcriptions of the files in Raw Texts, using Phonemizer or Epitran, and obtained with the scripts Phonemizer_Transcription.py or Epitran_transcription.py, respectively
+IPA_Bibles contains all IPA transcriptions of the files in Raw Texts, using Phonemizer or Epitran, and obtained with the scripts Phonemizer_Transcription.py or Epitran_Transcription.py, respectively
 
 Probability_Distributions contains 3-phone probability distributions of all languages, with or without word boundaries, and in a separate folder, 3-gram probability distributions using coarse-grained phoneme categories. It also contains the average 3-phone probability distribution of the Indo-European language family

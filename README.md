@@ -8,8 +8,10 @@ Description of the files:
 
 Alldist.txt contains all phonetic distances between pairs of languages in our corpus, obtained by calculating the Wasserstein distance between 3-phone probability distributions.
 
-Raw_Texts contains all 67 Bible text files 
+Raw texts contains all 67 Bible text files + Moby Dick in English
 
-IPA_Bibles contains all IPA transcriptions of the files in Raw Texts, using Phonemizer or Epitran, and obtained with the scripts Phonemizer_Transcription.py or Epitran_Transcription.py, respectively
+IPA texts contains all IPA transcriptions of the files in Raw Texts, using Phonemizer or Epitran, and obtained with the scripts Phonemizer_Transcription.py or Epitran_Transcription.py, respectively.
 
-Probability_Distributions contains 3-phone probability distributions of all languages, with or without word boundaries, and in a separate folder, 3-gram probability distributions using coarse-grained phoneme categories. It also contains the average 3-phone probability distribution of the Indo-European language family
+Proba_Distrib contains 3-phone probability distributions of all languages, with or without word boundaries, and in a separate folder, 3-gram probability distributions using coarse-grained phoneme categories. It also contains the average 3-phone probability distribution of the Indo-European language family
+
+wals_languages.csv contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591

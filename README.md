@@ -1,4 +1,4 @@
-This repository contains the code and data used during my 3-month research stay at IFISC in Palma de Mallorca, in which I carried out a stochastic modeling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
+This repository contains the code and data used during my 3-month research stay at IFISC in Palma de Mallorca, in which I carried out a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
 
 Abstract:
 

@@ -1,0 +1,9 @@
+r-gram,Counts
+vcc,366339
+ccc,73608
+ccv,366339
+cvc,747580
+vcv,538163
+cvv,156922
+vvc,156922
+vvv,25619

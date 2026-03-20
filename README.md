@@ -10,25 +10,25 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 
 ```
 ├── README.md
-├── Raw texts <- Pre-processed 67 Bible texts + Moby Dick (English)         
-├── IPA texts <- Bible texts transcribed in the IPA, without word boundaries
-├── ProbaDistrib       <- r-phone probability distributions for r = 1,...,5, with and without word boundaries
-│   ├── ProbaDistrib_IPA   <- Probability distributions of IPA r-phones 
-│   ├── ProbaDistrib_vect     <- Probability distributions of feature vectors (includes average IE probability distribution)
+├── Raw texts                            <- Pre-processed 67 Bible texts + Moby Dick (English)         
+├── IPA texts                            <- Bible texts transcribed in the IPA, without word boundaries
+├── ProbaDistrib                         <- r-phone probability distributions for r = 1,...,5, with and without word boundaries
+│   ├── ProbaDistrib_IPA                 <- Probability distributions of IPA r-phones 
+│   ├── ProbaDistrib_vect                <- Probability distributions of feature vectors (includes average IE probability distribution)
 │  
-├── Alldist.txt          <- Wasserstein distances between all pairs of languages
+├── Alldist.txt                          <- Wasserstein distances between all pairs of languages
 │
-├── wals_languages.csv       <- contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591
+├── wals_languages.csv                   <- contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591
 │
-├── Epitran_Transcription.py           <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Epitran
+├── Epitran_Transcription.py             <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Epitran
 │
-├── Phonemizer_Transcription.py           <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Phonemizer
+├── Phonemizer_Transcription.py          <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Phonemizer
 │
 ├── Geographic_correlations.py           <- Scripts to compute correlation between geographic and phonetic distances, and find plausible IE homeland
 │
 ├── Proba_Distrib_Memory_Estimation.py   <- Scripts to compute r-phone probability distributions from IPA texts, as well as predictability gains to estimate the memory
 │
-├── Wasserstein_Distance.py           <- Scripts to compute the Wasserstein distance between r-phone probability distributions
+├── Wasserstein_Distance.py              <- Scripts to compute the Wasserstein distance between r-phone probability distributions
 ```
 
 `Alldist.txt` contains all phonetic distances between pairs of languages in our corpus, obtained by calculating the Wasserstein distance between 3-phone probability distributions.

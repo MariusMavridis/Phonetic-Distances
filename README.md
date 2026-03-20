@@ -1,12 +1,37 @@
-This repository contains the code and data used during my 3-month research stay at IFISC in Palma de Mallorca, in which I carried out a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
+# Assessing Phonological Distances for Linguistic Typology and the Indo-European Origin
 
-Abstract:
+This repository contains the code and data used for a research project carried out at IFISC, in which we performed a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
 
-Human speech can be seen as a complex system where meaning arises from the interaction between many sound or grammatical units. More specifically, since language is sequential, it can be accurately modeled as a high-order Markov chain.  While this approach has been successful in studying cross-linguistic syntactic distances, phonetics studies usually focus on dialect comparison, with little data for each language. In this work, we model the sequence of sounds (or phonemes) in a text as a high-order Markov chain, and show using an information-theoretic framework that order-2 transition probabilities are enough to statistically characterize a given language. Using 67 translations of the Bible transcribed into the International Phonetic Alphabet, we compute the  pairwise distances between the probability distributions of blocks of 3 phonemes. The resulting phonetic distance matrix is used to recover language clusters, which reflect previously known language families and highlight the influence of language contact. We show that phonetic and geographic distances are correlated, and constrain an origin region for the Indo-European language family, consistent with the Steppe hypothesis.
+### Abstract
 
-Description of the files:
+We show that short-range phoneme dependencies encode large-scale patterns of linguistic relatedness, with direct implications for quantitative typology and evolutionary linguistics. Specifically, using an information-theoretic framework, we argue that phoneme sequences modeled as second-order Markov chains essentially capture the statistical correlations of a phonological system. This finding enables us to quantify distances among 67 modern languages from a multilingual parallel corpus. The resulting phonological distance matrix recovers major language families and reveals signatures of contact-induced convergence. Remarkably, we obtain a clear correlation with geographic distance, allowing us to constrain a plausible homeland region for the Indo-European family, consistent with the Steppe hypothesis.
 
-Alldist.txt contains all phonetic distances between pairs of languages in our corpus, obtained by calculating the Wasserstein distance between 3-phone probability distributions.
+### Project organization
+
+```
+├── README.md
+├── Raw texts <- Pre-processed 67 Bible texts + Moby Dick (English)         
+├── IPA texts <- Bible texts transcribed in the IPA, without word boundaries
+├── ProbaDistrib       <- r-phone probability distributions for r = 1,...,5, with and without word boundaries
+│   ├── ProbaDistrib_IPA   <- Probability distributions of IPA r-phones 
+│   ├── ProbaDistrib_vect     <- Probability distributions of feature vectors (includes average IE probability distribution)
+│  
+├── Alldist.txt          <- Wasserstein distances between all pairs of languages
+│
+├── wals_languages.csv       <- contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591
+│
+├── Epitran_Transcription.py           <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Epitran
+│
+├── Phonemizer_Transcription.py           <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Phonemizer
+│
+├── Geographic_correlations.py           <- Scripts to compute correlation between geographic and phonetic distances, and find plausible IE homeland
+│
+├── Proba_Distrib_Memory_Estimation.py   <- Scripts to compute r-phone probability distributions from IPA texts, as well as predictability gains to estimate the memory
+│
+├── Wasserstein_Distance.py           <- Scripts to compute the Wasserstein distance between r-phone probability distributions
+```
+
+`Alldist.txt` contains all phonetic distances between pairs of languages in our corpus, obtained by calculating the Wasserstein distance between 3-phone probability distributions.
 
 Raw texts contains all 67 Bible text files + Moby Dick in English
 

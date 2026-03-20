@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[16]:
-
-
 from tqdm import tqdm
 import re
 import os
@@ -14,9 +11,6 @@ from itertools import product
 import numpy as np   
 import panphon
 ft = panphon.FeatureTable()
-
-
-# In[8]:
 
 
 path_to_IPA = "" 
@@ -95,13 +89,6 @@ IE_languages = ['af', 'sq', 'bg', 'cs', 'nl', 'en-gb','fr-fr', 'fa', 'de', 'el',
 'ru', 'sr', 'sk', 'sl', 'sv', 'es', 'uk', 'bn', 'tgk-Cyrl', 'hy', 'hyw', 'be', 'bs', 'ca', 'gd', 'ltg', 'sd', 'si', 'cy']
 
 
-# In[9]:
-
-
-len(Language_codes)
-
-
-# In[18]:
 
 
 path_to_distrib = "" 
@@ -113,7 +100,7 @@ translation_table = {ord('ː') : None, ord('̝') : None, ord('"') : None, ord('�
 
 # ## r-gram probability distributions
 
-# In[19]:
+
 
 
 def isolate_phonemes(word, lg): 
@@ -160,10 +147,6 @@ def isolate_phonemes(word, lg):
         return phonemes_w
         
 
-
-# In[21]:
-
-
 def separate_phonemes(word, lg): 
     # returns the list of phonemes in input word, with repetition
     word = word.translate(translation_table)
@@ -197,7 +180,6 @@ def separate_phonemes(word, lg):
         return phonemes_w
 
 
-# In[55]:
 
 
 def find_phonemes(lg):
@@ -221,9 +203,6 @@ def find_phonemes(lg):
     return phonemes
 
 
-# In[23]:
-
-
 def phon_length(w): # returns phonetic length of IPA string (number of phonemes)
     positions_nasal = [m.start() for m in re.finditer('̃', w)] # find nasal vowels
     positions_asp = [m.start() for m in re.finditer('ʰ', w)] # find aspirated consonants
@@ -236,14 +215,9 @@ def phon_length(w): # returns phonetic length of IPA string (number of phonemes)
     return len(w) - nb_spec
 
 
-# In[24]:
-
-
 def n_grams(n, alphabet): # returns the list of all possible n-grams given input alphabet
-    return [''.join(comb) for comb in product(alphabet, repeat=n):]
+    return [''.join(comb) for comb in product(alphabet, repeat=n)]
 
-
-# In[54]:
 
 
 def r_grams_sep(r, lg): 
@@ -272,9 +246,6 @@ def r_grams_sep(r, lg):
     
 
 
-# In[44]:
-
-
 def r_grams_one_seq(r, lg): 
     # same as r_grams_sep but without word boundaries
     # source text is already filtered (because once the word boundaries are erased we can't remove wrongly transcribed words)
@@ -294,9 +265,6 @@ def r_grams_one_seq(r, lg):
     return r_grams
 
 
-# In[77]:
-
-
 def Proba_distrib_sep(lg, r, path_to_distrib): 
     # writes a txt file with the probability distribution of r-grams in the input language, with word boundaries 
     with open(path_to_distrib + Language_codes[lg] + '_' + str(r) + '-grams_sep_words.txt' , "w", newline = '', encoding='utf-8') as f:
@@ -310,9 +278,6 @@ def Proba_distrib_sep(lg, r, path_to_distrib):
             Row['Counts'] = r_grams[gram]
             writer.writerow(Row)               
         
-
-
-# In[41]:
 
 
 def Proba_distrib_seq(lg, r, path_to_distrib): 
@@ -331,9 +296,6 @@ def Proba_distrib_seq(lg, r, path_to_distrib):
         
 
 
-# In[ ]:
-
-
 def Proba_distrib_seq_vect(lg, r, path_to_distrib): 
     # same as Proba_distrib_seq but with the feature vector representaion of 3-grams
     with open(path_to_distrib + Language_codes[lg] + '_' + str(i) + '-grams_one_sequence_vect.txt' , "w", newline = '', encoding='utf-8') as f:
@@ -350,7 +312,6 @@ def Proba_distrib_seq_vect(lg, r, path_to_distrib):
 
 # ### Coarse-grained phoneme category probability distributions 
 
-# In[ ]:
 
 
 # phoneme categories
@@ -360,9 +321,6 @@ back_nback = ['ɯ', 'u', 'ʊ', 'ɤ', 'o', 'ʌ', 'ɔ', 'ɑ', 'ɒ']
 open_nopen = ['ɑ', 'ɒ','æ', 'ɶ', 'a','ɐ']
 mid_cmid_omid = ['e', 'ø','ɘ', 'ɵ','ɤ', 'o','ə','ɜ','ɛ', 'œ','ɞ','ʌ', 'ɔ' ]
 close_nclose = ['i', 'y', 'ɪ', 'ʏ','ɨ','ʉ','ɯ', 'u', 'ʊ']
-
-
-# In[ ]:
 
 
 def cf1(p): # first class function : separate consonants vs vowels
@@ -391,7 +349,7 @@ def cf3(p): # consonant vs open-mid-close
             return 'o'
         elif p in mid_cmid_omid:
             return 'm'
-        return 'f' # f for "ferme"
+        return 'f' # f for "fermé", or "closed"
 
 def cf4(p): # voiced/unvoiced vs high-mid-low
     v = ft.word_to_vector_list(u'%s' %p, numeric=True)[0]
@@ -404,7 +362,7 @@ def cf4(p): # voiced/unvoiced vs high-mid-low
             return 'o'
         elif p in mid_cmid_omid:
             return 'm'
-        return 'f' # f for "ferme", or "close"
+        return 'f' # f for "fermé", or "closed"
 
 def cf5(p): # consonant vs open-mid-low
     v = ft.word_to_vector_list(u'%s' %p, numeric=True)[0]
@@ -414,7 +372,7 @@ def cf5(p): # consonant vs open-mid-low
         if p in front_nfront:
             return 'f'
         elif p in central:
-            return 'k' # kentr
+            return 'k' # central
         return 'b' # back
 
 def cf6(p): # voiced/unvoiced vs open-mid-low
@@ -427,11 +385,9 @@ def cf6(p): # voiced/unvoiced vs open-mid-low
         if p in front_nfront:
             return 'f'
         elif p in central:
-            return 'k' # kentr
+            return 'k' # central
         return 'b' # back
 
-
-# In[ ]:
 
 
 def separate_phonemes_feat(word, lg, classfunction): 
@@ -467,9 +423,6 @@ def separate_phonemes_feat(word, lg, classfunction):
         return phonemes_w
 
 
-# In[ ]:
-
-
 def r_grams_one_seq_feat(lg, r, cf): 
     # source text is already filtered (because once the word boundaries are erased we can't remove problematic words)
     print('Starting language', lg)
@@ -486,9 +439,6 @@ def r_grams_one_seq_feat(lg, r, cf):
             r_grams[rgram] = 1
     print('Language', lg, 'done')
     return r_grams
-
-
-# In[ ]:
 
 
 alphabets = {cf1 : ['c', 'v'], cf2 : ['u', 'c', 'v'], cf3 : ['c', 'o', 'm', 'f'], cf4 : ['c', 'u', 'o', 'm', 'f'], cf5 : ['c', 'f', 'k', 'b'], cf6 : ['c', 'u', 'f', 'k', 'b'] }
@@ -510,8 +460,6 @@ def Proba_distrib_seq_vect_feat(lg, r, cf):
 
 # ### Average of IE family
 
-# In[ ]:
-
 
 # compute the average 3gram probability distribution of the IE family
 Average_Proba_Distrib = {}
@@ -528,21 +476,13 @@ for lg in IE_languages:
                     Average_Proba_Distrib[gram] += Counts[gram]
 
 
-# In[ ]:
-
-
 n = len(New_Language_codes)
 for c in Average_Proba_Distrib:
     Average_Proba_Distrib[c] /= n
 
 
-# In[ ]:
-
 
 path_to_save_avg = ""
-
-
-# In[ ]:
 
 
 with open(path_to_save_avg, "w", newline = '', encoding='utf-8') as f:
@@ -558,10 +498,8 @@ with open(path_to_save_avg, "w", newline = '', encoding='utf-8') as f:
 
 # ## Memory Estimation
 
-# In[28]:
 
-
-def PredGain_improved(lg, sep_words, with_zeros):  # returns G0, G1, G2, G3 calculated with text = [words] or [bigseq]
+def PredGain_improved(lg, sep_words, with_zeros):  # returns G0, G1, G2, G3 calculated with text = [words] or [oneseq]
     # with_zeros = boolean variable to decide if zero-probability r-grams should be taken into account in the entropy calculation. 
     # it doesn't seem to have a huge influence on the result
     separation = {True : '-grams_sep_words.txt', False : '-grams_one_sequence.txt'}
@@ -638,8 +576,6 @@ def PredGain_improved(lg, sep_words, with_zeros):  # returns G0, G1, G2, G3 calc
     G_3, uG_3 = -(H_5[0] - 2*H_4[0] + H_3[0]), H_5[1] + 2*H_4[1] + H_3[1]
     return G_0, G_1, G_2, G_3
 
-
-# In[ ]:
 
 
 def Plot_Segmentations(lg): # compare the G values associated with the different classifications for language lg

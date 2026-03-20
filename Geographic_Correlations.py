@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
-
-
 import pandas as pd
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
@@ -23,9 +20,6 @@ import cartopy.feature as cfeature
 import networkx as nx
 import math
 from pyvis.network import Network
-
-
-# In[5]:
 
 
 path_to_dist = '' # path to file with all the phonetic distances between languages (file Alldist.txt in data repository)
@@ -103,9 +97,6 @@ Lg_codes ={ 'af' : 'Afrikaans',
 'tgk-Cyrl' : 'Tajik'}
 
 
-# In[6]:
-
-
 # define colors
 Families = {'Indo-European': None,
  'Afro-Asiatic': None,
@@ -118,9 +109,6 @@ Families = {'Indo-European': None,
  'Kartvelian': None,
  'Dravidian': None,
  }
-
-
-# In[7]:
 
 
 # get studied languages from WALS
@@ -150,9 +138,6 @@ with open(path_to_dist) as f:
 
 
 
-# In[8]:
-
-
 # compute geographic distances
 Geodist = {(l1, l2) : distance.distance(Coord[l1], Coord[l2]).km for l1, l2 in distances.keys()}
 
@@ -162,48 +147,21 @@ distances_IE = {(l1,l2) : distances[(l1,l2)] for l1,l2 in Geodist_IE}
 
 # #### Correlation coefficients
 
-# In[9]:
-
-
 corr_all = dcor.distance_correlation(np.array(list(Geodist.values())), np.array(list(distances.values())))
-
-
-# In[10]:
-
-
 print(f"Correlation between phonetic and geographic distance for all languages: {corr_all}")
 
 
-# In[11]:
-
-
 corr_IE = dcor.distance_correlation(np.array(list(Geodist_IE.values())), np.array(list(distances_IE.values())))
-
-
-# In[12]:
-
-
 print(f"Correlation between phonetic and geographic distance for IE languages: {corr_IE}")
 
 
 # #### Mantel test
 
-# In[13]:
-
-
 mantel.test(list(Geodist.values()), list(distances.values()))
-
-
-# In[14]:
-
-
 mantel.test(list(Geodist_IE.values()), list(distances_IE.values()))
 
 
 # #### Plots
-
-# In[15]:
-
 
 plt.scatter(Geodist.values(), distances.values(), s = 3)
 plt.xscale('log')
@@ -215,9 +173,6 @@ plt.title('Phonetic (Wasserstein) vs geographic distance for all languages ')
 plt.show()
 
 
-# In[16]:
-
-
 plt.scatter(Geodist_IE.values(), distances_IE.values(), s = 3)
 plt.xscale('log')
 plt.xlabel('Geographic distance (km)')
@@ -225,8 +180,6 @@ plt.ylabel('Phonetic distance')
 plt.title('Phonetic (Wasserstein) vs geographic distance for IE languages ')
 plt.show()
 
-
-# In[17]:
 
 
 df = pd.DataFrame({
@@ -239,8 +192,6 @@ fig = px.scatter(df, x= "Geographic distance (km)", y="Phonetic distance", hover
 fig.update_traces(marker=dict(size=8), textposition="top center")
 fig.show()
 
-
-# In[18]:
 
 
 # Logarithmic model for phonetic distance as a function of geographic distance
@@ -272,9 +223,6 @@ poptwsIE, pcovwsIE = cf(Model1, (Lats1, Longs1, Lats2, Longs2), list(distances_I
 poptwsall, pcovwsall = cf(Model1, (Lats1all, Longs1all, Lats2all, Longs2all), list(distances.values()))
 
 
-
-
-# In[19]:
 
 
 plt.figure(figsize = (8,6))
@@ -310,9 +258,6 @@ plt.tick_params(axis = 'both', which = 'major', labelsize = 14, direction = 'in'
 
 plt.xscale('log')
 plt.show()
-
-
-# In[20]:
 
 
 plt.figure(figsize = (8,6))
@@ -352,13 +297,8 @@ plt.show()
 
 # ## Origin of IE family
 
-# In[21]:
+path_to_avg_distances = '' # path to file with distances to avg distrib
 
-
-path_to_avg_distances = '/home/mavridis/Documents/Marius/code/out/Distances/WS/AvgdistIE.txt' # path to file with distances to avg distru
-
-
-# In[22]:
 
 
 def Phon_to_geo(d_phon, a, b):
@@ -373,15 +313,9 @@ with open(path_to_avg_distances) as f:
 GDist_to_avg = {lg : Phon_to_geo(PDist_to_avg[lg], poptwsIE[0], poptwsIE[1]) for lg in PDist_to_avg}
 
 
-# In[23]:
-
-
 def khi2(lat, lon):
     return sum([(distance.distance([lat, lon],Coord[lg]).km - GDist_to_avg[lg])**2 for lg in GDist_to_avg])
     
-
-
-# In[18]:
 
 
 # Grid dimensions (pixels)
@@ -398,9 +332,6 @@ def color_function(lat, lon):
 
 # Compute value for each point
 data_sq = [[color_function(lat_grid[i][j], lon_grid[i][j]) for i in range(65)] for j in tqdm(range(95))]
-
-
-# In[19]:
 
 
 # Plot heatmap of khi2 values
@@ -421,8 +352,6 @@ plt.show()
 
 
 # ### Permutation test
-
-# In[34]:
 
 
 def ShuffleCoord(n, calc_khi2):
@@ -491,13 +420,9 @@ def ShuffleCoord(n, calc_khi2):
     return(lowest_coord, minvals, Dcors)      
 
 
-# In[35]:
 
 
 _,_,Dcors = ShuffleCoord(1000, False) 
-
-
-# In[33]:
 
 
 p_value = ((np.sum(Dcors) >= corr_IE) + 1)/(len(Dcors) + 1)
@@ -505,13 +430,7 @@ p_value = ((np.sum(Dcors) >= corr_IE) + 1)/(len(Dcors) + 1)
 
 # ### Genealogical distance
 
-# In[20]:
-
-
 Lg_names_IE = list(PDist_to_avg.keys())
-
-
-# In[46]:
 
 
 # Define edges of IE family tree (links between languages)
@@ -637,8 +556,6 @@ var options = {
 
 
 
-# In[26]:
-
 
 def distance_between_leaves(G, leaf1, leaf2, root):
     # path from root
@@ -663,13 +580,10 @@ def distance_between_leaves(G, leaf1, leaf2, root):
     return d1 + d2
 
 
-# In[42]:
 
 
 Genealo_dist = {(l1, l2) : distance_between_leaves(G, l1, l2, "Proto-Indo-European") for l1, l2 in distances_IE}
 
-
-# In[41]:
 
 
 d2 = [distances_IE[(l1, l2)] for l1, l2 in distances_IE if Genealo_dist[(l1, l2)] == 2]

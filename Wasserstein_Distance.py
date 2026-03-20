@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#/home/mavridis/Documents/Marius/Jobs/TocalcnonIE/Group0.py
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from tqdm import tqdm

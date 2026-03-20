@@ -16,9 +16,9 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 │   ├── ProbaDistrib_IPA                 <- Probability distributions of IPA r-phones 
 │   ├── ProbaDistrib_vect                <- Probability distributions of feature vectors (includes average IE probability distribution)
 │  
-├── Alldist.txt                          <- Wasserstein distances between all pairs of languages
+├── Alldist.txt                          <- Wasserstein distances between all pairs of languages, obtained with `Wasserstein_Distance.py`
 │
-├── wals_languages.csv                   <- contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591
+├── wals_languages.csv                   <- contains info about languages in the WALS database
 │
 ├── Epitran_Transcription.py             <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Epitran
 │
@@ -31,12 +31,7 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 ├── Wasserstein_Distance.py              <- Scripts to compute the Wasserstein distance between r-phone probability distributions
 ```
 
-`Alldist.txt` contains all phonetic distances between pairs of languages in our corpus, obtained by calculating the Wasserstein distance between 3-phone probability distributions.
-
-Raw texts contains all 67 Bible text files + Moby Dick in English
-
-IPA texts contains all IPA transcriptions of the files in Raw Texts, using Phonemizer or Epitran, and obtained with the scripts Phonemizer_Transcription.py or Epitran_Transcription.py, respectively.
 
 Proba_Distrib contains 3-phone probability distributions of all languages, with or without word boundaries, and in a separate folder, 3-gram probability distributions using coarse-grained phoneme categories. It also contains the average 3-phone probability distribution of the Indo-European language family
 
-wals_languages.csv contains info about languages in the WALS database, and was downloaded at https://zenodo.org/records/13950591
+wals_languages.csv was downloaded at https://zenodo.org/records/13950591

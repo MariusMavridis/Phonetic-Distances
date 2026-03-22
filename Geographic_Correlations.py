@@ -22,7 +22,7 @@ import math
 from pyvis.network import Network
 
 
-path_to_dist = '' # path to file with all the phonetic distances between languages (file Alldist.txt in data repository)
+path_to_dist = '' # path to file with all the phonetic distances between languages (file Alldist.txt in this repository)
 
 # load wals database
 languages_df = pd.read_csv('wals_languages.csv')

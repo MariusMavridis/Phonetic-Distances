@@ -32,7 +32,4 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 ├── Wasserstein_Distance.py              <- Scripts to compute the Wasserstein distance between r-phone probability distributions
 ```
 
-
-Proba_Distrib contains 3-phone probability distributions of all languages, with or without word boundaries, and in a separate folder, 3-gram probability distributions using coarse-grained phoneme categories. It also contains the average 3-phone probability distribution of the Indo-European language family
-
 wals_languages.csv was downloaded at https://zenodo.org/records/13950591

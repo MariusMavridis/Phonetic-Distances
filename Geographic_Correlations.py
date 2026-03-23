@@ -17,12 +17,9 @@ from tqdm import tqdm
 from cmcrameri import cm
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import networkx as nx
-import math
-from pyvis.network import Network
 
 
-path_to_dist = '' # path to file with all the phonetic distances between languages (file Alldist.txt in this repository)
+path_to_dist = 'Alldist.txt' # path to file with all the phonetic distances between languages (file Alldist.txt in this repository)
 
 # load wals database
 languages_df = pd.read_csv('wals_languages.csv')
@@ -51,6 +48,7 @@ Lg_codes ={ 'af' : 'Afrikaans',
 'kn' : 'Kannada',
 'lv' : 'Latvian',
 'lt' : 'Lithuanian',
+'la' : 'Latin',
 'ml' : 'Malayalam',
 'mr' : 'Marathi',
 'ne' : 'Nepali',
@@ -132,10 +130,8 @@ with open(path_to_dist) as f:
     for line in d:
         line = line.split(' ')
         lg1, lg2 = line[0], line[1]
-        if 'af' not in [lg1, lg2]: # remove Afrikaans for geographic correlations
+        if not any(lg in ['af', 'la', 'pap'] for lg in [lg1, lg2]): # remove Afrikaans for geographic correlations and exclude Latin and Papiamentu because not in final sample
             distances[(Lg_codes[lg1], Lg_codes[lg2])] = float(line[3][:-2])
-
-
 
 
 # compute geographic distances
@@ -144,6 +140,7 @@ Geodist = {(l1, l2) : distance.distance(Coord[l1], Coord[l2]).km for l1, l2 in d
 Geodist_IE = {(l1,l2) : Geodist[(l1,l2)] for l1,l2 in Geodist if l1 in grouped["Indo-European"] and l2 in grouped["Indo-European"]}
 distances_IE = {(l1,l2) : distances[(l1,l2)] for l1,l2 in Geodist_IE}
 
+Coord_IE = {name : coord for name, coord in Coord.items() if name in grouped["Indo-European"]}
 
 # #### Correlation coefficients
 
@@ -216,7 +213,7 @@ def Modified_Distance(coords):
 def Model1(coords, a, b):
     return np.log(Modified_Distance(coords)) * a + b
 
-def affine1(x, a, b):
+def logmodel(x, a, b):
     return np.log(x) * a + b
 
 poptwsIE, pcovwsIE = cf(Model1, (Lats1, Longs1, Lats2, Longs2), list(distances_IE.values()))
@@ -228,7 +225,7 @@ poptwsall, pcovwsall = cf(Model1, (Lats1all, Longs1all, Lats2all, Longs2all), li
 plt.figure(figsize = (8,6))
 Phdist = np.array(list(distances_IE.values()))
 xdata = list(Geodist_IE.values())
-yfit = np.array(affine1(xdata, poptwsIE[0], poptwsIE[1]))
+yfit = np.array(logmodel(xdata, poptwsIE[0], poptwsIE[1]))
 
 # Calculate phondist mean
 phdist_mean = np.mean(Phdist)
@@ -247,7 +244,7 @@ print(f"ss_res: {ss_res:.3f}")
 # Calculate R squared
 r_squared = 1 - ss_res / ss_tot
 print(f"R squared: {r_squared:.4f}")
-plt.plot(np.linspace(np.min(xdata),np.max(xdata),1000), affine1(np.linspace(np.min(xdata),np.max(xdata),1000), poptwsIE[0], poptwsIE[1]), color = 'black', label = f'${round(poptwsIE[0],3)}\ln(d) + {round(poptwsIE[1],3)}, R^2 = {round(r_squared,3)}  $', linestyle = '-')
+plt.plot(np.linspace(np.min(xdata),np.max(xdata),1000), logmodel(np.linspace(np.min(xdata),np.max(xdata),1000), poptwsIE[0], poptwsIE[1]), color = 'black', label = f'${round(poptwsIE[0],3)}\ln(d) + {round(poptwsIE[1],3)}, R^2 = {round(r_squared,3)}  $', linestyle = '-')
 
 plt.scatter(Geodist_IE.values(), distances_IE.values(), s = 3)
 plt.legend(fontsize = 14)
@@ -263,7 +260,7 @@ plt.show()
 plt.figure(figsize = (8,6))
 Phdist = np.array(list(distances.values()))
 xdata = list(Geodist.values())
-yfit = np.array(affine1(xdata, poptwsall[0], poptwsall[1]))
+yfit = np.array(logmodel(xdata, poptwsall[0], poptwsall[1]))
 
 # Calculate phondist mean
 phdist_mean = np.mean(Phdist)
@@ -282,7 +279,7 @@ print(f"ss_res: {ss_res:.3f}")
 # Calculate R squared
 r_squared = 1 - ss_res / ss_tot
 print(f"R squared: {r_squared:.4f}")
-plt.plot(np.linspace(np.min(xdata),np.max(xdata),1000), affine1(np.linspace(np.min(xdata),np.max(xdata),1000), poptwsall[0], poptwsall[1]), color = 'black', label = f'${round(poptwsall[0],3)}\ln(d) + {round(poptwsall[1],3)}, R^2 = {round(r_squared, 3)}  $', linestyle = '-')
+plt.plot(np.linspace(np.min(xdata),np.max(xdata),1000), logmodel(np.linspace(np.min(xdata),np.max(xdata),1000), poptwsall[0], poptwsall[1]), color = 'black', label = f'${round(poptwsall[0],3)}\ln(d) + {round(poptwsall[1],3)}, R^2 = {round(r_squared, 3)}  $', linestyle = '-')
 
 plt.scatter(Geodist.values(), distances.values(), s = 3)
 plt.legend(fontsize = 14)
@@ -295,134 +292,199 @@ plt.xscale('log')
 plt.show()
 
 
-# ## Origin of IE family
+path_to_avg_distances = 'AvgdistIE.txt' # path to file with distances to avg distrib
 
-path_to_avg_distances = '' # path to file with distances to avg distrib
+geod = Geod(ellps="WGS84")
+
+def geodesic_grid_to_langs(lat_grid, lon_grid, lang_lats, lang_lons):
+    # Returns array of shape (H, W, N) with geodesic distances in km
+    H, W = lat_grid.shape
+    N = len(lang_lats)
+    dist_grid = np.empty((H, W, N))
+
+    for k in range(N):
+        _, _, dist = geod.inv(lon_grid, lat_grid, np.full((H, W), lang_lons[k]), np.full((H, W), lang_lats[k]))
+        dist_grid[:, :, k] = dist / 1000.0        # m to km
+    return dist_grid
 
 
+# Minimize khi2, plot heatmap, and compute uncertainty region
 
-def Phon_to_geo(d_phon, a, b):
-    return np.exp((d_phon-b)/a)
+def IEOriginmap():
+
+    popt, _ = cf(logmodel, list(Geodist_IE.values()), list(distances_IE.values()))
+
+    def Phon_to_geo(d_phon, a, b):
+        return np.exp((d_phon - b) / a)
+
+    with open('C:/Users/mariu/Downloads/AvgdistIE.txt') as f:
+        r = f.readlines()
+        PDist_to_avg = {}
+        for line in r:
+            line = line.split(':')
+            PDist_to_avg[Lg_codes[line[0][2:-1]]] = float(line[1][:-2])
+    GDist_to_avg = {lg : Phon_to_geo(PDist_to_avg[lg], popt[0], popt[1]) for lg in PDist_to_avg}
+    GDist_to_avg = np.array([Phon_to_geo(PDist_to_avg[lg], popt[0], popt[1]) for lg in PDist_to_avg])  
+    lglist = list(PDist_to_avg.keys())
+    N = len(lglist)
+    # Precompute the grid once 
+    width, height = 95 * 2, 65 * 2
+    lon = np.linspace(-10, 85, width)
+    lat = np.linspace(5, 70, height)
+    lon_grid, lat_grid = np.meshgrid(lon, lat)  
+
+    # Precompute language coordinates as arrays
+    lang_lats = np.array([Coord_IE[lg][0] for lg in lglist])  
+    lang_lons = np.array([Coord_IE[lg][1] for lg in lglist]) 
+
+    # Vectorized geodesic distance: grid point -> each language 
+    print("Precomputing distance grid...")
+    dist_grid = geodesic_grid_to_langs(lat_grid, lon_grid, lang_lats, lang_lons)
+    diff2 = (dist_grid - GDist_to_avg[None, None, :])**2
+
     
-PDist_to_avg = {}
-with open(path_to_avg_distances) as f:
-    r = f.readlines()
-    for line in r:
-        line = line.split(':')
-        PDist_to_avg[Lg_codes[line[0][2:-1]]] = float(line[1][:-2])
-GDist_to_avg = {lg : Phon_to_geo(PDist_to_avg[lg], poptwsIE[0], poptwsIE[1]) for lg in PDist_to_avg}
+    # Precompute (dist - GDist_to_avg)^2 
+    diff2 = (dist_grid - GDist_to_avg[None, None, :])**2  
 
-
-def khi2(lat, lon):
-    return sum([(distance.distance([lat, lon],Coord[lg]).km - GDist_to_avg[lg])**2 for lg in GDist_to_avg])
+    T_K = [1] * N                 
+   
     
+    khi2_grid = diff2 @ T_K                     
+    idx_lat, idx_lon = np.unravel_index(khi2_grid.argmin(), khi2_grid.shape)
+
+    lat_min, lon_min = lat[idx_lat], lon[idx_lon]  
 
 
-# Grid dimensions (pixels)
-width, height =95, 65
+    fig = plt.figure(figsize=(12, 6))
+    ax = plt.axes(projection=ccrs.PlateCarree())
+    
+    
+    # remove sea cells
+    land_shp = shapereader.natural_earth(
+        resolution='110m',
+        category='physical',
+        name='land'
+    )
+    
+    land_geom = list(shapereader.Reader(land_shp).geometries())
+    
+    # Merge all lands
+    land_union = unary_union(land_geom)
+    
+    land = prep(land_union)
+    # create mask
+    data_ = khi2_grid
+    mask = np.zeros_like(data_, dtype=bool)
+    
+    for i in range(len(lat)):
+        for j in range(len(lon)):
+            point = Point(lon[j], lat[i])
+            if land.contains(point):
+                mask[i, j] = True
+    
+    
+    
+    # Apply mask to remove sea
+    masked_data = np.where(mask, np.log(data_), np.nan)
 
-# Latitude and longitude grids
-lon = np.linspace(-10, 85, width)
-lat = np.linspace(5, 70, height)
-lon_grid, lat_grid = np.meshgrid(lon, lat)
-
-# Color function
-def color_function(lat, lon):
-    return khi2(lat,lon)
-
-# Compute value for each point
-data_sq = [[color_function(lat_grid[i][j], lon_grid[i][j]) for i in range(65)] for j in tqdm(range(95))]
 
 
-# Plot heatmap of khi2 values
-fig = plt.figure(figsize=(12, 6))
-ax = plt.axes(projection=ccrs.PlateCarree())
+    # Plot
+    img = ax.pcolormesh(
+        lon, lat,
+        masked_data,
+        cmap=cm.buda.reversed(),
+        shading='auto',
+        transform=ccrs.PlateCarree(),
+        edgecolors='none',   
+        linewidth=0,         
+        rasterized=True      
+    ) 
+    
+    K = 2000
+    
+    T_K = dirichlet.rvs([1] * N, size=K)                 
+    min_coords = [] # list of r* values 
+    
+    for m in tqdm(range(K)):
+        weights = T_K[m]                                  
+        khi2_grid = diff2 @ weights                        
+        idx_lat, idx_lon = np.unravel_index(khi2_grid.argmin(), khi2_grid.shape)
+        min_coords.append((lat[idx_lat], lon[idx_lon]))   
+    dist_diric_real = [distance.distance([lat_min, lon_min], [lat, lon]).km for lat, lon in min_coords]
+    R = np.percentile(dist_diric_real, 95) # 95% radius around r*
+            
+    
+    def plot_circle_km(ax, lon_center, lat_center, radius_km, **kwargs):
+        """Plot a circle of radius_km around (lon_center, lat_center) on a cartopy map."""
+        angles = np.linspace(0, 2 * np.pi, 360)
+        R_earth = 6371.0  # km
+    
+        lat_center_rad = np.radians(lat_center)
+        lon_center_rad = np.radians(lon_center)
+        d = radius_km / R_earth  # angular distance in radians
+    
+        lats = np.degrees(np.arcsin(
+            np.sin(lat_center_rad) * np.cos(d) +
+            np.cos(lat_center_rad) * np.sin(d) * np.cos(angles)
+        ))
+        lons = lon_center + np.degrees(np.arctan2(
+            np.sin(angles) * np.sin(d) * np.cos(lat_center_rad),
+            np.cos(d) - np.sin(lat_center_rad) * np.sin(np.radians(lats))
+        ))
+    
+        ax.plot(lons, lats, transform=ccrs.PlateCarree(), **kwargs)
+    
+    ax.coastlines()
+    ax.plot(lon_min, lat_min, 'r*', ms = 10)
+    
+    norm = mpl.colors.Normalize(vmin=np.nanmin(masked_data),
+                            vmax=np.nanmax(masked_data))
 
-img = ax.pcolormesh(lon, lat, np.log(np.transpose(data_sq)), cmap=cm.lipari, shading='auto', transform=ccrs.PlateCarree())
-norm = mcolors.Normalize(vmin = np.min(data_sq), vmax = np.max(data_sq))
+    cb = plt.colorbar(img, ax=ax, norm=norm, orientation='vertical')
+    cb.set_label(label='$\log(\chi^2)$', fontsize=18, labelpad=15)
+    cb.ax.tick_params(labelsize='x-large')
+    if R:
+        plot_circle_km(ax, lon_min, lat_min, R, color='red', linestyle = '--', linewidth = 1.5, zorder = 5)
+    ax.add_feature(cfeature.BORDERS, linestyle=':')
+    ax.add_feature(cfeature.LAND, edgecolor='black', facecolor='none', linewidth = 2)
+    plt.show()  
 
-cb = plt.colorbar(img, ax=ax, norm=norm, orientation='vertical') 
-cb.set_label(label='$\log(\chi^2)$', fontsize = 18, labelpad = 15)
-cb.ax.tick_params(labelsize = 'x-large')
-ax.coastlines()
-ax.add_feature(cfeature.BORDERS, linestyle=':')
-ax.add_feature(cfeature.LAND, edgecolor='black', facecolor='none')
+IEOriginmap()
 
-plt.show()
 
 
 # ### Permutation test
 
 
-def ShuffleCoord(n, calc_khi2):
-    # performs n random shuffles of language coordinates and computes correlation coefficient between phonetic geographic distances
-    # outputs:
-    # lowest_coord: point that minimize khi2 for each random shuffle
-    # minvals: minimum value of khi2 for each shuffle (associated to the point in lowest_coord)
-    # Dcors: correlation coefficients for each shuffle
+def ShuffleCoord(dist, n, ref_dcor): # dist is either distances or distances_IE
+    keys = list(dist.keys())
+    dist_values = np.array(list(dist.values()))
+    print(len(keys),len(dist_values))
     
-    lowest_coord = []
-    minvals = []
-    Dcors = []
+    coord_keys = list({lg for pair in keys for lg in pair})
+    coord_values = [Coord[lg] for lg in coord_keys]
+    n_langs = len(coord_keys)
+
+    Dcors = np.empty(n)
 
     for i in tqdm(range(n)):
-        
         # Shuffle coordinates
-        C = list(Coord.values())
-        random.shuffle(C)
-        SCoord = {list(Coord.keys())[i] : C[i] for i in range(len(C)) }
-        
-        # Compute geographic distances 
-        Geodist = {}
-        for lang1, lang2 in distances_IE.keys():
-            Geodist[lang1, lang2] = distance.distance(SCoord[lang1], SCoord[lang2]).km
+        shuffled_indices = np.random.permutation(n_langs)
+        SCoord = dict(zip(coord_keys, [coord_values[j] for j in shuffled_indices]))
 
-        # Compute correlation coefficient
-        Dcors.append(dcor.distance_correlation(np.array(list(Geodist.values())), np.array(list(distances_IE.values()))))
+        # Compute geographic distances
+        geo_dist = np.array([
+            distance.distance(SCoord[l1], SCoord[l2]).km
+            for l1, l2 in keys
+        ])
 
-        # optional (but much longer): compute khi2 values for this random shuffle
-        if calc_khi2:
-            # fit a log curve
-            popt, pcov = cf(affine1, list(Geodist.values()), list(distances_IE.values()))
-    
-            # convert the phonetic distances into geographic distances
-            GDist_to_avg = {lg : Phon_to_geo(PDist_to_avg[lg], popt[0], popt[1]) for lg in PDist_to_avg}
-    
-            # define sum of residuals
-            def khi2(lat, lon): 
-                s = 0
-                for lg in GDist_to_avg:
-                    s += (distance.distance([lat, lon],SCoord[lg]).km - GDist_to_avg[lg])**2
-                return np.log(s)
-        
-            # Grid dimensions (pixels)
-            width, height = 95, 65
-            
-            # Latitude/longitude grids
-            lon = np.linspace(-10, 85, width)
-            lat = np.linspace(5, 70, height)
-            lon_grid, lat_grid = np.meshgrid(lon, lat)
-        
-            
-            # Compute khi2 for each grid point
-            data_sq = [[khi2(lat_grid[i][j], lon_grid[i][j]) for i in range(65)] for j in range(95)]
-            data = np.array(data_sq)
-    
-            # get smallest khi2 value and its coords
-            lowest_coord.append(np.unravel_index(data.argmin(), data.shape))
-            minvals.append(np.min(data))
-            
-            ind = [(i,val) for i,val in enumerate(data.flatten())]
-        minvals = np.array(minvals)
-    
-        lowest_coord = np.array(lowest_coord)
-    
-    return(lowest_coord, minvals, Dcors)      
+        Dcors[i] = dcor.distance_correlation(geo_dist, dist_values)
+
+    p_value = np.sum(Dcors >= ref_dcor) / n
+    return p_value    
 
 
 
 
-_,_,Dcors = ShuffleCoord(1000, False) 
-
-
-p_value = ((np.sum(Dcors) >= corr_IE) + 1)/(len(Dcors) + 1)
+p_value = ShuffleCoord(distances_IE, 1000, 0.496) # takes a while to run

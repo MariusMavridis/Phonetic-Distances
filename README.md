@@ -19,6 +19,8 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 │  
 ├── Alldist.txt                          <- Wasserstein distances between all pairs of languages, obtained with `Wasserstein_Distance.py`
 │
+├── AvgdistIE.txt                        <- Wasserstein distances between IE languages and the average 3-phone probability distribution of IE languages
+│
 ├── wals_languages.csv                   <- contains info about languages in the WALS database
 │
 ├── Epitran_Transcription.py             <- Scripts to transcribe Bible texts from Raw_texts to IPA texts using Epitran

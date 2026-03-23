@@ -1,6 +1,6 @@
 # Phonological Distances for Linguistic Typology and the Indo-European Origin
 
-This repository contains the code and data used for a research project carried out at IFISC, in which we performed a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
+This repository contains the code and data used for a research project carried out at [IFISC](https://ifisc.uib-csic.es/en/), in which we performed a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
 
 ### Abstract
 
@@ -18,6 +18,8 @@ We show that short-range phoneme dependencies encode large-scale patterns of lin
 │   ├── ProbaDistrib_vect                <- Probability distributions of feature vectors (includes average IE probability distribution)
 │  
 ├── Alldist.txt                          <- Wasserstein distances between all pairs of languages, obtained with `Wasserstein_Distance.py`
+│
+├── AvgdistIE.txt                        <- Wasserstein distances between IE languages and the average 3-phone probability distribution of IE languages
 │
 ├── wals_languages.csv                   <- contains info about languages in the WALS database
 │

@@ -1,6 +1,6 @@
 # Phonological Distances for Linguistic Typology and the Indo-European Origin
 
-This repository contains the code and data used for a research project carried out at IFISC, in which we performed a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
+This repository contains the code and data used for a research project carried out at [IFISC](https://ifisc.uib-csic.es/en/), in which we performed a stochastic modelling of phonetic distances between languages, and explored correlations between phonetic similarity and geographic proximity. 
 
 ### Abstract
 
